@@ -1,9 +1,13 @@
-# WorkingFlow
-## 1. RVineMatrixSample()
+## I. Vine
+### 1. RVineMatrixSample()
 
-## 2. RVineMLE()
+### 2. RVineMLE()
 
-## 3. RVineCopSelect()
+### 3. RVineCopSelect()
 
-## 4. RVineStructureSelect()
+### 4. RVineStructureSelect()
 RVineVuongTest()
+
+## II. VaR
+
+## III. FitDist
