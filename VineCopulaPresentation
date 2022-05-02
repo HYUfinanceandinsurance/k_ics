@@ -1,0 +1,396 @@
+---
+title: "VineCopulaPresentation"
+author: "Seo, InKyo"
+date: '2022-05-01'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Housekeeping and Data Preparation
+
+-   attach packages;
+    -   VineCopula
+    -   dplyr
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(VineCopula)
+library(dplyr)
+library(data.table)
+library(gt)
+rm(list=ls())
+mydata <- fread("/Users/inkyoseo/Sample_kics.txt")
+```
+
+-   read a sample data(Jeong(2022))
+
+```{r}
+head(mydata) %>% 
+  data.frame() %>%
+  gt() %>%
+  tab_header(
+    title = md("The Simulated Sample Data From Model1, Jeong(2022)"),
+#    subtitle = "It is one of six datasets in the package"
+#  ) %>%
+#  tab_source_note(md("More information is available at `?exibble`.")
+  )
+```
+
+-   Summary
+
+```{r}
+summary(mydata)
+plot(mydata)
+```
+
+## 2. convert it as pseudo-observations using pobs()
+
+```{r pobs}
+mysdata<- pobs(mydata)
+head(mysdata)
+cor(mysdata)
+```
+
+## 3. RVineStructureSelect
+
+### Select Vine Structure
+
+Modeling tail dependence might has to be more concerned when we are dealing with VaR but one side only as how VaR is measured; no need BB1 or BB7 modeling that is able to picture tail-asymmetric dependence with different non-zero lower and upper tail dependence, otherwise negative dependence occurs.
+
+```{r}
+plot(as.data.frame(mysdata))
+```
+
+Therefore, model 1 to 6 only with no rotations
+
+-   R-Vine
+
+```{r RVineStructureSelect}
+rvm <- RVineStructureSelect(mysdata,
+                            c(1,2,3,4,5,6),
+                            rotations = F, 
+                            selectioncrit = "AIC",
+                            indeptest = TRUE, level = 0.05, 
+                            type = "RVine")
+
+summary(rvm)
+contour(rvm)
+```
+
+$$f_{1,2,3,4} = f_{1,3}f_{2,3}f_{3,4}f_{1,4|3}f_{2,4|3}f_{1,2|3,4}$$
+
+-   C-Vine
+
+```{r}
+cvm <- RVineStructureSelect(mysdata, c(1,2,3,4,5,6),rotations = F,
+                            selectioncrit = "AIC", 
+                            indeptest = TRUE, level = 0.05, 
+                            type = "CVine")
+summary(cvm)
+contour(cvm)
+```
+
+-   D-Vine
+
+```{r D-Vine}
+library(TSP)
+d <- dim(mysdata)[2]
+M <- 1 - abs(TauMatrix(mysdata))
+hamilton <- insert_dummy(TSP(M), 
+                         label = "cut")
+sol <- solve_TSP(hamilton, 
+                 method = "repetitive_nn")
+order <- cut_tour(sol, 
+                  "cut")
+DVM <- D2RVine(order, 
+               family = rep(0,d*(d-1)/2), 
+               par = rep(0, d*(d-1)/2))
+dvm <- RVineCopSelect(mysdata, 
+                      c(1:6),
+                      rotations = F, 
+                      DVM$Matrix)
+
+colnames(dvm$family) <- c("V1","V2","V3","V4")
+colnames(dvm$Matrix) <- c("V1","V2","V3","V4")
+summary(dvm)
+contour(dvm)
+```
+```{r}
+BiCopPar2TailDep(family=4, par=1.5, par2=0)
+```
+
+$$f_{1,2,3,4} = f_{1}f_{2}f_{3}f_{4}f_{1,3|4}f_{2,4|3}f_{1,2|4,5}$$
+
+```{r}
+dvm$family %>% 
+  data.frame() %>%
+  gt() %>%
+  tab_header(
+    title = md("The Selected Family Structure in a Matrix Form"),
+#    subtitle = "It is one of six datasets in the package"
+#  ) %>%
+#  tab_source_note(md("More information is available at `?exibble`.")
+  )
+
+```
+
+```{r}
+dvm$Matrix %>% 
+  data.frame() %>%
+  gt() %>%
+  tab_header(
+    title = md("The Selected D-Vine Structure in a Matrix Form"),
+#    subtitle = "It is one of six datasets in the package"
+#  ) %>%
+#  tab_source_note(md("More information is available at `?exibble`.")
+  )
+```
+
+## 4. Plot
+
+-   D-Vine
+
+```{r echo=TRUE}
+plot(dvm, tree=1, edge.labels=c("family","theotau"))
+```
+
+-   C-Vine
+
+```{r echo=TRUE}
+plot(cvm, tree=1, edge.labels=c("family","theotau"))
+```
+
+-   R-Vine
+
+```{r echo=TRUE}
+plot(rvm, tree=1, edge.labels=c("family","theotau"))
+```
+
+## 5. AIC, BIC, Vuong
+
+-   Vuong Test
+
+```{r VuongTest}
+t(RVineVuongTest(mysdata, dvm, cvm))
+# alpha = 0.05
+qnorm(1-0.05/2)
+```
+
+-   AIC
+
+```{r}
+c(RVineAIC(mysdata,dvm)$AIC, RVineAIC(mysdata,cvm)$AIC)
+```
+
+-   BIC
+
+```{r C-Vine}
+cvmBIC <- RVineStructureSelect(mysdata, 
+                               selectioncrit = "BIC",
+                               indeptest = TRUE, 
+                               level = 0.05, 
+                               type = "CVine")
+dvmBIC <- RVineCopSelect(mysdata, c(1:6), 
+                         selectioncrit = "BIC",
+                         DVM$Matrix)
+c(RVineBIC(mysdata,dvmBIC)$BIC, RVineBIC(mysdata,cvmBIC)$BIC)
+```
+
+## 6. Which Vine are more 'robust'?
+
+```{r}
+set.seed(1)
+tcvmData <- RVineSim(100000, cvm, U = NULL)
+tdvmData <- RVineSim(100000, dvm, U = NULL)
+
+tcvm <- RVineStructureSelect(tcvmData, c(1,2,3,4,5,6),
+                             rotations = F,
+                             selectioncrit = "AIC", 
+                             indeptest = TRUE,
+                             level = 0.05, 
+                             type = "RVine")
+tdvm <- RVineStructureSelect(tdvmData, c(1,2,3,4,5,6),
+                             rotations = F,
+                             selectioncrit = "AIC", 
+                             indeptest = TRUE,
+                             level = 0.05, 
+                             type = "RVine")
+
+setequal(tcvm$family, cvm$family)
+setequal(tcvm$Matrix, cvm$Matrix)
+
+setequal(tdvm$family, dvm$family)
+setequal(tdvm$Matrix, dvm$Matrix)
+
+summary(tcvm)
+summary(cvm)
+
+summary(tdvm)
+summary(dvm)
+```
+
+
+## 7. With small sample size
+
+- Generate 120 sample size from the model
+
+```{r}
+Sample120 <- RVineSim(120, cvm, U = NULL)
+```
+
+### (1). RVineSeqEst for starting point in MLE
+
+```{r}
+SeqE <- RVineSeqEst(
+      Sample120,
+      cvm,
+      method = "mle",
+      se = FALSE,
+      progress = TRUE,
+      weights = NA,
+      cores = 1
+)
+```
+
+- Starting Points for mle
+```{r}
+SeqE$par
+SeqE$par2
+```
+
+### (2). Calculate MLE
+- function inputs
+```{r}
+ RVineMLE(
+      Sample120,
+      cvm,
+      start = cvm$par,
+      start2 = cvm$par2,
+      maxit = 200,
+      grad = TRUE,
+      hessian = TRUE,
+      se = FALSE)
+```
+
+### when we don't have any insights such as restricting range of models that is potentially selected,
+
+```{r}
+Testrvm <- RVineStructureSelect(mysdata, 
+                                selectioncrit = "AIC",
+                                indeptest = TRUE, 
+                                level = 0.05, 
+                                type = "RVine")
+TSample120 <- RVineSim(120, Testrvm, U = NULL)
+STestrvm <- RVineStructureSelect(TSample120, 
+                                 selectioncrit = "AIC", 
+                                 indeptest = TRUE, 
+                                 level = 0.05, 
+                                 type = "RVine")
+
+summary(Testrvm)
+summary(STestrvm)
+```
+
+### Not identical...
+
+## 8. Statistics
+
+### (1). Vuong 
+$$
+\mathbf{statistic} := \nu = \frac{\frac{1}{n}\sum^{N}_{i=1}m_{i}}{\sqrt{\sum^{N}_{i=1}(m_{i}-\bar{m})^2}} \\
+m_{i} = log \left[ \frac{c_{1}(u_{i}|(\hat{\theta}_{1})}{c_{2}(u_{i}|(\hat{\theta}_{2})} \right] 
+$$
+
+### (2). Independence Test based on Kendall’s
+$$
+\mathbf{statistic} := T = \sqrt{\frac{9N(N-1)}{2(2N+5)}} \times |\hat{\tau}| \\
+\mathbf{p.value} = 2 \times (1-\Phi(T))
+$$
+
+## 9. Example Codes from VineCopula Package
+
+### (1). likelihood example of Clayton (VineCopula/src/likelihood.c)
+```{r engine='Rcpp'}
+void LL(int* family, int*n, double*u, 
+double* v, double* theta, double* nu, double* loglik)
+{
+    int j;
+    double *dat, rho, ll=0.0, t1=0.0, t2=0.0, f;
+   //Allocate memory:
+    dat = Calloc(2,double);
+
+    for(int i=0;i<*n;i++)
+    {
+        if(u[i]<UMIN) u[i]=UMIN;
+        else if(u[i]>UMAX) u[i]=UMAX;
+        if(v[i]<UMIN) v[i]=UMIN;
+        else if(v[i]>UMAX) v[i]=UMAX;
+    }
+
+        if(*theta == 0) ll = 0;
+        else if(*theta < 1e-10) ll = 0;
+        else
+        {
+            for(j=0;j<*n;j++)
+            {
+                dat[0] = u[j]; dat[1] = v[j];
+                f=log1p(*theta)-(1.0+*theta)*log(dat[0]*dat[1])-(2.0+1.0/(*theta))*log(pow(dat[0],-*theta)+pow(dat[1],-*theta)-1.0);
+                if(f>XINFMAX) ll += log(XINFMAX);
+                else if(f<log(DBL_MIN)) ll += log(DBL_MIN);
+                else ll += f;
+            }
+        }
+    })
+```
+
+### (2). Inverse Conditional Distribution Function of a Bivariate Copula (BiCopHinv)
+- h-function is defined as the conditional distribution function of a bivariate copula, i.e.,
+
+$$
+h_{1}(u_{2}|u_{1};\theta) := P(U_{2}\leq u_{2}|U_{1}=u_{1}) = \frac{\partial C(u_{1}, u_{2}; \theta)}{\partial u_{1}} \\
+h_{2}(u_{1}|u_{2};\theta) := P(U_{1}\leq u_{1}|U_{2}=u_{2}) = \frac{\partial C(u_{1}, u_{2}; \theta)}{\partial u_{2}}
+$$
+where $(U_{},U_{}) ~\sim C$
+
+- An Example Code
+```{r engine='Rcpp'}
+// h-func for BB1
+
+void pcondbb1(double* u, double* v, int* n, double* param, double* out)
+{
+    int i;
+    double th, de;
+    double t1, t2, t3, t16, t17, t4, t5, t6, t7, t9, t10, t12, t13, t20;
+
+    th = param[0];
+    de = param[1];
+    for(i=0;i<*n;i++)
+    {
+        t1 = pow(u[i],-th);
+        t2 = t1-1.;
+        t3 = pow(t2,de);
+        t16 = 1./u[i];
+        t17 = 1./t2;
+        t4 = pow(v[i],-th);
+        t5 = t4-1.;
+        t6 = pow(t5,de);
+        t7 = t3+t6;
+        t9 = pow(t7,1/de);
+        t10 = 1.0+t9;
+        t12 = pow(t10,-1/th);
+        t13 = t12*t9;
+        t20 = 1./t10;
+        out[i] = t13*t3*t1*t16*t17/t7*t20;
+    }
+
+}
+```
+
+
+
+
