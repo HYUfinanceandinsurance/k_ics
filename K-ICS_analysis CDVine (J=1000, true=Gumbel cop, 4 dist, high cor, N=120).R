@@ -35,13 +35,13 @@ prd120.vstd <- rep(NA, J)
 prd120.vemp <- rep(NA, J)
 prd120.varc <- rep(NA, J)
 prd120.velp <- rep(NA, J)
-prd120.cvine <- rep(NA, J)
+prd120.rvine <- rep(NA, J)
 
 prd120.var_std <- 0
 prd120.var_emp <- 0
 prd120.var_arc <- 0
 prd120.var_elp <- 0
-prd120.var_CVine <- 0
+prd120.var_RVine <- 0
 
 for (i in 1:J) {
   set.seed(i)
@@ -91,11 +91,11 @@ for (i in 1:J) {
   init.elpparm <- c(cor(psd120.cop)[1,2:4], cor(psd120.cop)[2,3:4], cor(psd120.cop)[3,4],4)
   
   cvm <- RVineStructureSelect(psd120.cop,
-                               c(1,2,3,4,5,6),
-                               rotations = F, 
-                               selectioncrit = "AIC",
-                               indeptest = TRUE, level = 0.05, 
-                               type = "RVine")
+                              c(1,2,3,4,5,6),
+                              rotations = F, 
+                              selectioncrit = "AIC",
+                              indeptest = TRUE, level = 0.05, 
+                              type = "RVine")
   d <- dim(psd120.cop)[2]
   M <- 1 - abs(TauMatrix(psd120.cop))
   hamilton <- insert_dummy(TSP(M), 
@@ -110,7 +110,7 @@ for (i in 1:J) {
                         c(1:6),
                         rotations = F, 
                         DVM$Matrix)
-
+  
   dvm
   vuong <- RVineVuongTest(psd120.cop, cvm, dvm)
   vuong$p.value
@@ -148,28 +148,28 @@ for (i in 1:J) {
   
   prv120.risk_life <- qnorm(    prv120.cop[,1], sd   =est120.parm_life[2], mean=est120.parm_life[1])
   prv120.risk_life <- prv120.risk_life - mean(prv120.risk_life)
-  prv120.risk_pnc  <- qpareto2( pcv120.cop[,2], s    =est120.parm_pnc[ 2], k   =est120.parm_pnc[ 1]) 
+  prv120.risk_pnc  <- qpareto2( prv120.cop[,2], s    =est120.parm_pnc[ 2], k   =est120.parm_pnc[ 1]) 
   prv120.risk_pnc  <- prv120.risk_pnc  - mean(prv120.risk_pnc)
-  prv120.risk_cred <- qt(       pcv120.cop[,3], df=4)*est120.parm_cred[2]      +est120.parm_cred[1] 
+  prv120.risk_cred <- qt(       prv120.cop[,3], df=4)*est120.parm_cred[2]      +est120.parm_cred[1] 
   prv120.risk_cred <- prv120.risk_cred  - mean(prv120.risk_cred)
   prv120.risk_mkt  <- exp(qnorm(prv120.cop[,4], sd   =est120.parm_mkt[ 2], mean=est120.parm_mkt[ 1]))
   prv120.risk_mkt <- prv120.risk_mkt - mean(prv120.risk_mkt)
-  pcv120.risk_total <- prv120.risk_life + prv120.risk_pnc + prv120.risk_cred + prv120.risk_mkt
+  prv120.risk_total <- prv120.risk_life + prv120.risk_pnc + prv120.risk_cred + prv120.risk_mkt
   
   prd120.vstd[i]  <- sqrt(prd120.var_marginal %*% (diag(4)*0.75+0.25) %*% prd120.var_marginal)
   prd120.vemp[i]  <- quantile(sam120.risk_total, probs=0.995)
   prd120.varc[i]  <- quantile(pad120.risk_total, probs=0.995)
   prd120.velp[i]  <- quantile(pld120.risk_total, probs=0.995)
-  prd120.rvine[i] <- quantile(pcv120.risk_total, probs=0.995)
+  prd120.rvine[i] <- quantile(prv120.risk_total, probs=0.995)
   
   prd120.var_std  <- prd120.var_std + sqrt(prd120.var_marginal %*% (diag(4)*0.75+0.25) %*% prd120.var_marginal)/J
   prd120.var_emp  <- prd120.var_emp + quantile(sam120.risk_total, probs=0.995)/J
   prd120.var_arc  <- prd120.var_arc + quantile(pad120.risk_total, probs=0.995)/J
   prd120.var_elp  <- prd120.var_elp + quantile(pld120.risk_total, probs=0.995)/J
-  prd120.var_RVine <- prd120.var_RVine + quantile(pcv120.risk_total, probs=0.995)/J
+  prd120.var_RVine <- prd120.var_RVine + quantile(prv120.risk_total, probs=0.995)/J
 }
 
-c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_CVine)
+c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_RVine)
 c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_RVine) - pop.var_true
 
 
