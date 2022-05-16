@@ -137,7 +137,7 @@ for (i in 1:J) {
   prd120.vemp[i]  <- quantile(sam120.risk_total, probs=0.995)
   prd120.varc[i]  <- quantile(pad120.risk_total, probs=0.995)
   prd120.velp[i]  <- quantile(pld120.risk_total, probs=0.995)
-  
+  prd120.cvine[i] <- quantile(pcv120.risk_total, probs=0.995)
   
   prd120.var_std  <- prd120.var_std + sqrt(prd120.var_marginal %*% (diag(4)*0.75+0.25) %*% prd120.var_marginal)/J
   prd120.var_emp  <- prd120.var_emp + quantile(sam120.risk_total, probs=0.995)/J
@@ -155,4 +155,4 @@ summary(prd120.varc - pop.var_true)
 summary(prd120.velp - pop.var_true)
 summary(prd120.cvine - pop.var_true)
 
-save.image("K-ICS_analysis (J=1000, true=g cop, g dist, mid cor, N=120).RData")
+save.image("K-ICS_analysis (J=1000, true=g cop, g dist, high cor, N=120).RData")
