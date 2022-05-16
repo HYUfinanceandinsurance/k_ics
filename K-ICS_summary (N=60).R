@@ -1,44 +1,44 @@
 load("K-ICS_analysis (J=1000, true=g cop, g dist, high cor, N=60).RData")
-prd120_ggh  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_ggh  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=g cop, g dist, mid cor, N=60).RData")
-prd120_ggm  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_ggm  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=g cop, g dist, low cor, N=60).RData")
-prd120_ggl  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_ggl  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=Gumbel cop, 4 dist, high cor, N=60).RData")
-prd120_a4h  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_a4h  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=Gumbel cop, 4 dist, mid cor, N=60).RData")
-prd120_a4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_a4m  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=Gumbel cop, 4 dist, low cor, N=60).RData")
-prd120_a4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_a4l  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=t cop, 4 dist, high cor, N=60).RData")
-prd120_t4h  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_t4h  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=t cop, 4 dist, mid cor, N=60).RData")
-prd120_t4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_t4m  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
 load("K-ICS_analysis (J=1000, true=t cop, 4 dist, low cor, N=60).RData")
-prd120_t4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd60_t4l  <- cbind(prd60.vstd, prd60.vemp, prd60.varc, prd60.velp, prd60.cvine, pop.var_true) 
 
-rm(list = ls()[!ls() %in% c("prd120_t4h", "prd120_t4m", "prd120_t4l",
-                            "prd120_a4h", "prd120_a4m", "prd120_a4l",
-                            "prd120_ggh", "prd120_ggm", "prd120_ggl")])
+rm(list = ls()[!ls() %in% c("prd60_t4h", "prd60_t4m", "prd60_t4l",
+                            "prd60_a4h", "prd60_a4m", "prd60_a4l",
+                            "prd60_ggh", "prd60_ggm", "prd60_ggl")])
 
 stable <-
-  rbind(c(colMeans(prd120_ggl), colMeans(prd120_ggl)[1:5]-colMeans(prd120_ggl)[6]),
-        c(colMeans(prd120_ggm), colMeans(prd120_ggm)[1:5]-colMeans(prd120_ggm)[6]),
-        c(colMeans(prd120_ggh), colMeans(prd120_ggh)[1:5]-colMeans(prd120_ggh)[6]),
-        c(colMeans(prd120_a4l), colMeans(prd120_a4l)[1:5]-colMeans(prd120_a4l)[6]),
-        c(colMeans(prd120_a4m), colMeans(prd120_a4m)[1:5]-colMeans(prd120_a4m)[6]),
-        c(colMeans(prd120_a4h), colMeans(prd120_a4h)[1:5]-colMeans(prd120_a4h)[6]),
-        c(colMeans(prd120_t4l), colMeans(prd120_t4l)[1:5]-colMeans(prd120_t4l)[6]),
-        c(colMeans(prd120_t4m), colMeans(prd120_t4m)[1:5]-colMeans(prd120_t4m)[6]),
-        c(colMeans(prd120_t4h), colMeans(prd120_t4h)[1:5]-colMeans(prd120_t4h)[6]))
+  rbind(c(colMeans(prd60_ggl), colMeans(prd60_ggl)[1:5]-colMeans(prd60_ggl)[6]),
+        c(colMeans(prd60_ggm), colMeans(prd60_ggm)[1:5]-colMeans(prd60_ggm)[6]),
+        c(colMeans(prd60_ggh), colMeans(prd60_ggh)[1:5]-colMeans(prd60_ggh)[6]),
+        c(colMeans(prd60_a4l), colMeans(prd60_a4l)[1:5]-colMeans(prd60_a4l)[6]),
+        c(colMeans(prd60_a4m), colMeans(prd60_a4m)[1:5]-colMeans(prd60_a4m)[6]),
+        c(colMeans(prd60_a4h), colMeans(prd60_a4h)[1:5]-colMeans(prd60_a4h)[6]),
+        c(colMeans(prd60_t4l), colMeans(prd60_t4l)[1:5]-colMeans(prd60_t4l)[6]),
+        c(colMeans(prd60_t4m), colMeans(prd60_t4m)[1:5]-colMeans(prd60_t4m)[6]),
+        c(colMeans(prd60_t4h), colMeans(prd60_t4h)[1:5]-colMeans(prd60_t4h)[6]))
 
 rownames(stable) <- c("Low", "Medium", "High",
                       "Low", "Medium", "High",
@@ -56,141 +56,141 @@ labels <- factor(labels, levels = c("Standard", "Empirical", "Internal 1", "Inte
 
 library(ggplot2)
 
-prt120_ggh     <- as.data.frame(cbind(as.vector(prd120_ggh[,1:5]-prd120_ggh[,6]),
+prt60_ggh     <- as.data.frame(cbind(as.vector(prd60_ggh[,1:5]-prd60_ggh[,6]),
                                       rep(1, 1000)))
-prt120_ggh[,2] <- labels
-colnames(prt120_ggh) <- c("Diff", "Label")
+prt60_ggh[,2] <- labels
+colnames(prt60_ggh) <- c("Diff", "Label")
 
-plt120_ggh <- ggplot(prt120_ggh, aes(x=Label, y=Diff, fill=Label)) +
+plt60_ggh <- ggplot(prt60_ggh, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 3")
 
-plt120_ggh
+plt60_ggh
 
 
-prt120_ggm     <- as.data.frame(cbind(as.vector(prd120_ggm[,1:5]-prd120_ggm[,6]),
+prt60_ggm     <- as.data.frame(cbind(as.vector(prd60_ggm[,1:5]-prd60_ggm[,6]),
                                       rep(1, 1000)))
-prt120_ggm[,2] <- labels
-colnames(prt120_ggm) <- c("Diff", "Label")
+prt60_ggm[,2] <- labels
+colnames(prt60_ggm) <- c("Diff", "Label")
 
-plt120_ggm <- ggplot(prt120_ggm, aes(x=Label, y=Diff, fill=Label)) +
+plt60_ggm <- ggplot(prt60_ggm, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 2")
 
-plt120_ggm
+plt60_ggm
 
 
-prt120_ggl     <- as.data.frame(cbind(as.vector(prd120_ggl[,1:5]-prd120_ggl[,6]),
+prt60_ggl     <- as.data.frame(cbind(as.vector(prd60_ggl[,1:5]-prd60_ggl[,6]),
                                       rep(1, 1000)))
-prt120_ggl[,2] <- labels
-colnames(prt120_ggl) <- c("Diff", "Label")
+prt60_ggl[,2] <- labels
+colnames(prt60_ggl) <- c("Diff", "Label")
 
-plt120_ggl <- ggplot(prt120_ggl, aes(x=Label, y=Diff, fill=Label)) +
+plt60_ggl <- ggplot(prt60_ggl, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 1")
 
-plt120_ggl
+plt60_ggl
 
 
-prt120_a4h     <- as.data.frame(cbind(as.vector(prd120_a4h[,1:5]-prd120_a4h[,6]),
+prt60_a4h     <- as.data.frame(cbind(as.vector(prd60_a4h[,1:5]-prd60_a4h[,6]),
                                       rep(1, 1000)))
-prt120_a4h[,2] <- labels
-colnames(prt120_a4h) <- c("Diff", "Label")
+prt60_a4h[,2] <- labels
+colnames(prt60_a4h) <- c("Diff", "Label")
 
-plt120_a4h <- ggplot(prt120_a4h, aes(x=Label, y=Diff, fill=Label)) +
+plt60_a4h <- ggplot(prt60_a4h, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 6")
 
-plt120_a4h
+plt60_a4h
 
-prt120_a4m     <- as.data.frame(cbind(as.vector(prd120_a4m[,1:5]-prd120_a4m[,6]),
+prt60_a4m     <- as.data.frame(cbind(as.vector(prd60_a4m[,1:5]-prd60_a4m[,6]),
                                       rep(1, 1000)))
-prt120_a4m[,2] <- labels
-colnames(prt120_a4m) <- c("Diff", "Label")
+prt60_a4m[,2] <- labels
+colnames(prt60_a4m) <- c("Diff", "Label")
 
-plt120_a4m <- ggplot(prt120_a4m, aes(x=Label, y=Diff, fill=Label)) +
+plt60_a4m <- ggplot(prt60_a4m, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 5")
 
-plt120_a4m
+plt60_a4m
 
 
-prt120_a4l     <- as.data.frame(cbind(as.vector(prd120_a4l[,1:5]-prd120_a4l[,6]),
+prt60_a4l     <- as.data.frame(cbind(as.vector(prd60_a4l[,1:5]-prd60_a4l[,6]),
                                       rep(1, 1000)))
-prt120_a4l[,2] <- labels
-colnames(prt120_a4l) <- c("Diff", "Label")
+prt60_a4l[,2] <- labels
+colnames(prt60_a4l) <- c("Diff", "Label")
 
-plt120_a4l <- ggplot(prt120_a4l, aes(x=Label, y=Diff, fill=Label)) +
+plt60_a4l <- ggplot(prt60_a4l, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 4")
 
-plt120_a4l
+plt60_a4l
 
-prt120_t4h     <- as.data.frame(cbind(as.vector(prd120_t4h[,1:5]-prd120_t4h[,6]),
+prt60_t4h     <- as.data.frame(cbind(as.vector(prd60_t4h[,1:5]-prd60_t4h[,6]),
                                       rep(1, 1000)))
-prt120_t4h[,2] <- labels
-colnames(prt120_t4h) <- c("Diff", "Label")
+prt60_t4h[,2] <- labels
+colnames(prt60_t4h) <- c("Diff", "Label")
 
-plt120_t4h <- ggplot(prt120_t4h, aes(x=Label, y=Diff, fill=Label)) +
+plt60_t4h <- ggplot(prt60_t4h, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 9")
 
-plt120_t4h
+plt60_t4h
 
-prt120_t4m     <- as.data.frame(cbind(as.vector(prd120_t4m[,1:5]-prd120_t4m[,6]),
+prt60_t4m     <- as.data.frame(cbind(as.vector(prd60_t4m[,1:5]-prd60_t4m[,6]),
                                       rep(1, 1000)))
-prt120_t4m[,2] <- labels
-colnames(prt120_t4m) <- c("Diff", "Label")
+prt60_t4m[,2] <- labels
+colnames(prt60_t4m) <- c("Diff", "Label")
 
-plt120_t4m <- ggplot(prt120_t4m, aes(x=Label, y=Diff, fill=Label)) +
+plt60_t4m <- ggplot(prt60_t4m, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 8")
 
-plt120_t4m
+plt60_t4m
 
 
-prt120_t4l     <- as.data.frame(cbind(as.vector(prd120_t4l[,1:5]-prd120_t4l[,6]),
+prt60_t4l     <- as.data.frame(cbind(as.vector(prd60_t4l[,1:5]-prd60_t4l[,6]),
                                       rep(1, 1000)))
-prt120_t4l[,2] <- labels
-colnames(prt120_t4l) <- c("Diff", "Label")
+prt60_t4l[,2] <- labels
+colnames(prt60_t4l) <- c("Diff", "Label")
 
-plt120_t4l <- ggplot(prt120_t4l, aes(x=Label, y=Diff, fill=Label)) +
+plt60_t4l <- ggplot(prt60_t4l, aes(x=Label, y=Diff, fill=Label)) +
   geom_violin(trim=FALSE) + geom_boxplot(width=0.1)  +
   scale_fill_brewer(palette="Blues") + theme_classic() +
   theme(legend.position = "none", axis.title.x = element_blank(),
         axis.title.y = element_blank(), plot.title = element_text(hjust = 0.5)) +
   ggtitle("Scenario 7")
 
-plt120_t4l
+plt60_t4l
 
 library(gridExtra)
 
-grid.arrange(plt120_ggl, plt120_ggm, plt120_ggh,
-             plt120_a4l, plt120_a4m, plt120_a4h,
-             plt120_t4l, plt120_t4m, plt120_t4h, ncol=3)
+grid.arrange(plt60_ggl, plt60_ggm, plt60_ggh,
+             plt60_a4l, plt60_a4m, plt60_a4h,
+             plt60_t4l, plt60_t4m, plt60_t4h, ncol=3)
 
 save.image("K-ICS_summary (N=60).RData")
