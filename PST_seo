@@ -1,0 +1,579 @@
+---
+title: "VineCopulaPresentation"
+author: "Seo, InKyo"
+date: '2022-05-01'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Housekeeping and Data Preparation
+
+-   attach packages;
+    -   VineCopula
+    -   dplyr
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(VineCopula)
+library(dplyr) 
+library(data.table)
+library(gt) # table layout
+library(agop) # pareto dist
+rm(list=ls())
+mydata <- fread("/Users/inkyoseo/Sample_kics.txt")
+```
+
+-   read a sample data(Jeong(2022))
+
+```{r}
+head(mydata) %>% 
+  data.frame() %>%
+  gt() %>%
+  tab_header(
+    title = md("The Simulated Sample Data From Model1, Jeong(2022)"),
+#    subtitle = "It is one of six datasets in the package"
+#  ) %>%
+#  tab_source_note(md("More information is available at `?exibble`.")
+  )
+```
+
+-   Summary
+
+```{r}
+summary(mydata)
+plot(mydata)
+```
+
+## 2. convert it as pseudo-observations using pobs()
+
+```{r pobs}
+mysdata<- pobs(mydata)
+
+mktlsd <- sqrt(2*(log(500)-6))
+mysdata2 <- mydata %>%
+  mutate(pop.risk_life = pnorm(pop.risk_life+500, mean=500, sd=1000)) %>%
+  mutate(pop.risk_pnc = ppareto2(pop.risk_pnc+500, k=4 , s=1500)) %>%
+  mutate(pop.risk_cred = pt(pop.risk_cred/1000, df=4)) %>%
+  mutate(pop.risk_mkt = plnorm(pop.risk_mkt+500, meanlog = 6, sdlog = mktlsd))
+mydata
+
+mysdata3 <- pobs(mysdata2)
+
+cor(mysdata)
+cor(mysdata2)
+```
+
+## 3. RVineStructureSelect
+
+### Select Vine Structure
+
+* Modeling tail dependence might has to be more concerned when we are dealing with VaR but one side only as how VaR is measured; no need BB1 or BB7 modeling that is able to picture tail-asymmetric dependence with different non-zero lower and upper tail dependence, otherwise negative dependence occurs.
+
+```{r}
+plot(as.data.frame(mysdata))
+```
+
+Therefore, model 1 to 6 only with no rotations
+
+-   R-Vine
+
+```{r RVineStructureSelect}
+rvm <- RVineStructureSelect(mysdata,
+                            c(1,2,3,4,5,6),
+                            rotations = F, 
+                            selectioncrit = "AIC",
+                            indeptest = TRUE, level = 0.05, 
+                            type = "RVine")
+rvm2 <- RVineStructureSelect(mysdata2,
+                            c(1,2,3,4,5,6),
+                            rotations = F, 
+                            selectioncrit = "AIC",
+                            indeptest = TRUE, level = 0.05, 
+                            type = "RVine")
+rvm3 <- RVineStructureSelect(mysdata3,
+                            c(1,2,3,4,5,6),
+                            rotations = F, 
+                            selectioncrit = "AIC",
+                            indeptest = TRUE, level = 0.05, 
+                            type = "RVine")
+
+summary(rvm)
+summary(rvm2)
+summary(rvm3)
+
+contour(rvm)
+setequal(rvm3, rvm)
+contour(rvm2)
+```
+
+$$f_{1,2,3,4} = f_{1,3}f_{2,3}f_{3,4}f_{1,4|3}f_{2,4|3}f_{1,2|3,4}$$
+
+-   C-Vine
+
+```{r}
+cvm <- RVineStructureSelect(mysdata, c(1,2,3,4,5,6),rotations = F,
+                            selectioncrit = "AIC", 
+                            indeptest = TRUE, level = 0.05, 
+                            type = "CVine")
+summary(cvm)
+contour(cvm)
+```
+
+-   D-Vine
+
+```{r D-Vine}
+library(TSP)
+d <- dim(mysdata)[2]
+M <- 1 - abs(TauMatrix(mysdata))
+hamilton <- insert_dummy(TSP(M), 
+                         label = "cut")
+sol <- solve_TSP(hamilton, 
+                 method = "repetitive_nn")
+order <- cut_tour(sol, "cut")
+DVM <- D2RVine(order, 
+               family = rep(0,d*(d-1)/2), 
+               par = rep(0, d*(d-1)/2))
+dvm <- RVineCopSelect(mysdata, 
+                      c(1:6),
+                      rotations = F, 
+                      DVM$Matrix)
+
+colnames(dvm$family) <- c("V1","V2","V3","V4")
+colnames(dvm$Matrix) <- c("V1","V2","V3","V4")
+summary(dvm)
+contour(dvm)
+```
+```{r}
+BiCopPar2TailDep(family=4, par=1.5, par2=0)
+```
+
+$$f_{1,2,3,4} = f_{1}f_{2}f_{3}f_{4}f_{1,3|4}f_{2,4|3}f_{1,2|4,5}$$
+
+```{r}
+dvm$family %>% 
+  data.frame() %>%
+  gt() %>%
+  tab_header(
+    title = md("The Selected Family Structure in a Matrix Form"),
+#    subtitle = "It is one of six datasets in the package"
+#  ) %>%
+#  tab_source_note(md("More information is available at `?exibble`.")
+  )
+
+```
+
+```{r}
+dvm$Matrix %>% 
+  data.frame() %>%
+  gt() %>%
+  tab_header(
+    title = md("The Selected D-Vine Structure in a Matrix Form"),
+#    subtitle = "It is one of six datasets in the package"
+#  ) %>%
+#  tab_source_note(md("More information is available at `?exibble`.")
+  )
+```
+
+## 4. Plot
+
+-   D-Vine
+
+```{r echo=TRUE}
+plot(dvm, tree=1, edge.labels=c("family","theotau"))
+```
+
+-   C-Vine
+
+```{r echo=TRUE}
+plot(cvm, tree=1, edge.labels=c("family","theotau"))
+```
+
+-   R-Vine
+
+```{r echo=TRUE}
+plot(rvm, tree=1, edge.labels=c("family","theotau"))
+```
+
+## 5. AIC, BIC, Vuong
+
+-   Vuong Test
+
+```{r VuongTest}
+# alpha = 0.05, 0.10
+qnorm(1-0.05/2)
+qnorm(1-0.10/2)
+
+t(RVineVuongTest(mysdata, dvm, cvm))
+```
+
+-   AIC
+
+```{r}
+c(RVineAIC(mysdata,dvm)$AIC, RVineAIC(mysdata,cvm)$AIC)
+```
+
+-   BIC
+
+```{r C-Vine}
+cvmBIC <- RVineStructureSelect(mysdata, 
+                               selectioncrit = "BIC",
+                               indeptest = TRUE, 
+                               level = 0.05, 
+                               type = "CVine")
+dvmBIC <- RVineCopSelect(mysdata, c(1:6), 
+                         selectioncrit = "BIC",
+                         DVM$Matrix)
+c(RVineBIC(mysdata,dvmBIC)$BIC, RVineBIC(mysdata,cvmBIC)$BIC)
+```
+
+## 6. Which Vine are more 'robust'?
+
+```{r}
+set.seed(1)
+tcvmData <- RVineSim(120, cvm, U = NULL)
+tdvmData <- RVineSim(120, dvm, U = NULL)
+
+tcvm <- RVineStructureSelect(tcvmData, c(1,2,3,4,5,6),
+                             rotations = F,
+                             selectioncrit = "AIC", 
+                             indeptest = TRUE,
+                             level = 0.05, 
+                             type = "RVine")
+## determine the order of the nodes in a D-vine using the package TSP
+library(TSP)
+d <- dim(tdvmData)[2]
+M <- 1 - abs(TauMatrix(tdvmData))
+hamilton <- insert_dummy(TSP(M), label = "cut")
+sol <- solve_TSP(hamilton, method = "repetitive_nn")
+order <- cut_tour(sol, "cut")
+DVM <- D2RVine(order, family = rep(0,d*(d-1)/2), par = rep(0, d*(d-1)/2))
+tdvm <- RVineCopSelect(tdvmData, c(1:6), DVM$Matrix)
+
+setequal(tcvm$family, cvm$family)
+setequal(tcvm$Matrix, cvm$Matrix)
+
+setequal(tdvm$family, dvm$family)
+setequal(tdvm$Matrix, dvm$Matrix)
+
+summary(tcvm)
+summary(cvm)
+
+summary(tdvm)
+summary(dvm)
+```
+
+
+## 7. With small sample size
+
+- Generate 120 sample size from the model
+
+```{r}
+Sample120 <- RVineSim(120, cvm, U = NULL)
+```
+
+### (1). RVineSeqEst for starting point in MLE
+
+```{r}
+SeqE <- RVineSeqEst(
+      Sample120,
+      cvm,
+      method = "mle",
+      se = FALSE,
+      progress = TRUE,
+      weights = NA,
+      cores = 1
+)
+```
+
+- Starting Points for mle
+```{r}
+SeqE$par
+SeqE$par2
+```
+
+### (2). Calculate MLE
+- function inputs
+```{r}
+ RVineMLE(
+      Sample120,
+      cvm,
+      start = cvm$par,
+      start2 = cvm$par2,
+      maxit = 200,
+      grad = TRUE,
+      hessian = TRUE,
+      se = FALSE)
+```
+
+### when we don't have any insights such as restricting range of models that is potentially selected,
+
+```{r}
+Testrvm <- RVineStructureSelect(mysdata, 
+                                selectioncrit = "AIC",
+                                indeptest = TRUE, 
+                                level = 0.05, 
+                                type = "RVine")
+TSample120 <- RVineSim(120, Testrvm, U = NULL)
+STestrvm <- RVineStructureSelect(TSample120, 
+                                 selectioncrit = "AIC", 
+                                 indeptest = TRUE, 
+                                 level = 0.05, 
+                                 type = "RVine")
+
+summary(Testrvm)
+summary(STestrvm)
+```
+
+### Not identical...
+
+## 8. Statistics
+
+### (1). Vuong 
+
+- DEFINITION (Strictly Non-Nested Models): Two conditional models $\mathbf{F}_{\theta}$ and $\mathbf{G}_{\gamma}$ are strictly non-nested iff
+$$
+\mathbf{F}_{\theta} \cap \mathbf{G}_{\gamma} = \emptyset
+$$
+
+$$
+m_{i} = log \left[ \frac{c_{1}(u_{i}|(\hat{\theta}_{1})}{c_{2}(u_{i}|(\hat{\theta}_{2})} \right] 
+$$
+
+$$
+\mathbf{statistic} := \nu = \frac{\frac{1}{n}\sum^{N}_{i=1}m_{i}}{\sqrt{\sum^{N}_{i=1}(m_{i}-\bar{m})^2}}
+$$
+$$n^{-1/2}LR \sim Normal(0, w_n^{2}) $$
+$$\hat{w}_n = \sqrt{\frac{\sum^{N}_{i=1}(m_{i}-\bar{m})^2}{n}}$$
+
+$\nu$ is asymptotically standard normal. 
+
+$$
+H_{0} = E[m_i] = 0
+$$
+we prefer vine model 1 to vine model 2 at level $\alpha$ if
+$$
+\nu = \Phi^{-1}(1-\alpha/2)
+$$
+
+### (2). Independence Test based on Kendall’s
+$$
+\mathbf{statistic} := T = \sqrt{\frac{9N(N-1)}{2(2N+5)}} \times |\hat{\tau}|
+$$
+$$
+\mathbf{p.value} = 2 \times (1-\Phi(T))`
+$$
+
+## 9. Example Codes from VineCopula Package
+
+### (1). likelihood example of Clayton (VineCopula/src/likelihood.c)
+https://github.com/tnagler/VineCopula/blob/f14141f177bc719b9dc4b083735283988f3ff33b/src/likelihood.c
+
+
+### (2). Inverse Conditional Distribution Function of a Bivariate Copula (BiCopHinv)
+- h-function is defined as the conditional distribution function of a bivariate copula, i.e.,
+
+$$
+h_{1}(u_{2}|u_{1};\theta) := P(U_{2}\leq u_{2}|U_{1}=u_{1}) = \frac{\partial C(u_{1}, u_{2}; \theta)}{\partial u_{1}} 
+$$
+$$
+h_{2}(u_{1}|u_{2};\theta) := P(U_{1}\leq u_{1}|U_{2}=u_{2}) = \frac{\partial C(u_{1}, u_{2}; \theta)}{\partial u_{2}}
+$$
+where $(U_{},U_{}) ~\sim C$
+
+- An Example Code
+https://github.com/tnagler/VineCopula/blob/f14141f177bc719b9dc4b083735283988f3ff33b/src/hfunc.c
+
+## 10. VaR (Working on)
+```{r}
+#### Generation of hypothetical population data for dependent risks   ####
+
+set.seed(10000)
+obj.cop <- gumbelCopula(param = 1.38, dim=4)
+samples.cop <- rCopula(120000, obj.cop)
+cor(samples.cop)
+mktlsd <- sqrt(2*(log(500)-6))
+
+pop.risk_life <- qnorm(    samples.cop[,1], mean=500, sd=1000) - 500
+pop.risk_pnc  <- qpareto2( samples.cop[,2], k=4     , s=1500)  - 500
+pop.risk_cred <- qt(       samples.cop[,3], df=4)*1000+500     - 500
+pop.risk_mkt  <- exp(qnorm(samples.cop[,4], mean=6, sd=mktlsd))- 500
+pop.risk_total <- pop.risk_life + pop.risk_pnc + pop.risk_cred + pop.risk_mkt
+
+pop.var_true  <- quantile(pop.risk_total, probs=0.995)
+hist(pop.risk_total, breaks = 100, freq=FALSE)
+lines(density(pop.risk_total),col="red")
+abline(v=pop.var_true , col="blue")
+
+
+```
+
+
+
+```{r, eval=F, echo=T}
+J=120000 / 120
+
+prd120.vstd <- rep(NA, J)
+prd120.vemp <- rep(NA, J)
+prd120.varc <- rep(NA, J)
+prd120.velp <- rep(NA, J)
+
+prd120.var_std <- 0
+prd120.var_emp <- 0
+prd120.var_arc <- 0
+prd120.var_elp <- 0
+
+for (i in 1:J) {
+  set.seed(i)
+  sam120.cop <- RVineSim(1200, cvm, U = NULL)
+  
+  sam120.risk_life <- qnorm(    sam120.cop[,1], mean=500, sd=1000) - 500
+  sam120.risk_pnc  <- qpareto2( sam120.cop[,2], k=4     , s=1500)  - 500
+  sam120.risk_cred <- qt(       sam120.cop[,3], df=4)*1000+500     - 500
+  sam120.risk_mkt  <- qlnorm(sam120.cop[,4], mean=6, sd=mktlsd)- 500
+  sam120.risk_total <- sam120.risk_life + sam120.risk_pnc + sam120.risk_cred + sam120.risk_mkt
+  
+  library(gamlss) # Generalized Additive Models for Location Scale and Sape Package
+  library(gamlss.dist)
+  library(gamlss.add)
+  
+  
+  # Fit Distribution
+  
+  x <- sam120.risk_life
+  fit <- fitDist(x, k = 2, type = "realline", trace = F, try.gamlss = F)
+  summary(fit)
+  j = length(fit$parameters)
+  est120.parm_life <- fit$family[2]
+  for (i in 1:j) {
+    i <- fit$parameters[i]  
+    est120.parm_life[i] <- fit[i]
+    est120.parm_life %>% as.data.frame()
+  }
+  est120.parm_life
+  life_trans       <- -mean(sam120.risk_life)
+  trs120.risk_life  <- sam120.risk_life+life_trans 
+  
+  x <- sam120.risk_pnc - min(sam120.risk_pnc)
+  fit <- fitDist(x, k = 2, type = "realplus", trace = F, try.gamlss = F)
+  summary(fit)
+  fit$sta.mu
+  
+  j = length(fit$parameters)
+  est120.parm_pnc <- fit$family[2]
+  pnc_alpha       <- max(3, 2/(1-mean(x)^2/
+                                  var(x)))
+  est120.parm_pnc  <- c(fit$family[2],pnc_alpha, mean(x)*(pnc_alpha-1))
+  pnc_trans <- 1e-16 - min(sam120.risk_pnc)
+  trs120.risk_pnc  <- sam120.risk_pnc+pnc_trans
+  est120.parm_pnc
+  
+  x <- sam120.risk_cred
+  fit <- fitDist(x, k = 2, type = "realline")
+  j = length(fit$parameters)
+  est120.parm_cred <- fit$family[2]
+  for (i in 1:j) {
+  i <- fit$parameters[i]  
+  est120.parm_cred[i] <- fit[i]
+  est120.parm_cred %>% as.data.frame()
+  }
+  cred_trans <- -mean(sam120.risk_cred)
+  trs120.risk_cred  <- sam120.risk_cred+cred_trans 
+  est120.parm_cred
+  summary(fit)
+  
+  x <- sam120.risk_mkt - min(sam120.risk_mkt)
+  fit <- fitDist(x, k = 2, type = "realplus", trace = F, try.gamlss = F)
+  summary(fit)
+  est120.parm_mkt  <- c(fit$family[2] , log(mean(x))-0.5*log(var(x)/mean(x)^2+1), sqrt(log(var( x)/mean(x)^2+1)))
+  mkt_trans <- 1e-16 - min(sam120.risk_mkt)
+  trs120.risk_mkt  <- sam120.risk_mkt+mkt_trans
+  est120.parm_mkt
+  
+  library(agop) # pareto2
+  # var_marginal
+  prd120.var_marginal <- c(
+  qnorm(0.995, sd=as.numeric(est120.parm_life[3]), mean = as.numeric(est120.parm_life[2])),
+  qpareto2(0.995, s = as.numeric(est120.parm_pnc[3]), k = as.numeric(est120.parm_pnc[2])) - min(sam120.risk_pnc) ,
+  qt(0.995, df=as.numeric(est120.parm_cred[4]))*as.numeric(est120.parm_cred[3]) + as.numeric(est120.parm_cred[2]) ,
+  plnorm(0.995, sd = as.numeric(est120.parm_mkt[3]), mean = as.numeric(est120.parm_mkt[2]))- min(sam120.risk_mkt)) 
+
+  
+# cdf 
+    psd120.cop <- cbind(
+    pnorm(trs120.risk_life, mean=as.numeric(est120.parm_life[2]),
+          sd =as.numeric(est120.parm_life[3])),
+    ppareto2(trs120.risk_pnc , k=as.numeric(est120.parm_pnc[2]), 
+             s = as.numeric(est120.parm_pnc[ 3])),
+    pt(df=4, q=(trs120.risk_cred - as.numeric(est120.parm_cred[2]))  /  as.numeric(est120.parm_cred[3])),
+    pnorm((log(trs120.risk_mkt) - as.numeric(est120.parm_mkt[2]))  /  as.numeric(est120.parm_mkt[3])))
+    
+    
+  library(TSP)
+  d <- dim(psd120.cop)[2]
+  M <- 1 - abs(TauMatrix(psd120.cop))
+  hamilton <- insert_dummy(TSP(M), 
+                         label = "cut")
+  sol <- solve_TSP(hamilton, 
+                 method = "repetitive_nn")
+  order <- cut_tour(sol, "cut")
+  DVM <- D2RVine(order, 
+               family = rep(0,d*(d-1)/2), 
+               par = rep(0, d*(d-1)/2))
+  dvm <- RVineCopSelect(psd120.cop, 
+                      c(1:6),
+                      rotations = F, 
+                      DVM$Matrix)
+  rvm <- RVineStructureSelect(psd120.cop,
+                            c(1,2,3,4,5,6),
+                            rotations = F, 
+                            selectioncrit = "AIC",
+                            indeptest = TRUE, level = 0.05, 
+                            type = "RVine")
+    
+  pld120.cop <- RVineSim(20000, dvm, U = NULL)
+    
+  pld120.risk_life <- qnorm(pld120.cop[,1], sd=est120.parm_life[2], mean=est120.parm_life[1])
+  pld120.risk_life <- pld120.risk_life - mean(pld120.risk_life)
+  pld120.risk_pnc  <- qpareto2( pld120.cop[,2], s=est120.parm_pnc[ 2], k   =est120.parm_pnc[ 1]) 
+  pld120.risk_pnc  <- pld120.risk_pnc - mean(pld120.risk_pnc)
+  pld120.risk_cred <- qt(pld120.cop[,3], df=4)*est120.parm_cred[2]      +est120.parm_cred[1] 
+  pld120.risk_cred <- pld120.risk_cred  - mean(pld120.risk_cred)
+  pld120.risk_mkt  <- exp(qnorm(pld120.cop[,4], sd=est120.parm_mkt[ 2], mean=est120.parm_mkt[ 1]))
+  pld120.risk_mkt  <- pld120.risk_mkt - mean(pld120.risk_mkt)
+  pld120.risk_total <- pld120.risk_life + pld120.risk_pnc + pld120.risk_cred + pld120.risk_mkt
+  
+  pad120.cop <- RVineSim(20000, dvm, U = NULL)
+  
+  pad120.risk_life <- qnorm(    pad120.cop[,1], sd   =est120.parm_life[2], mean=est120.parm_life[1])
+  pad120.risk_life <- pad120.risk_life - mean(pad120.risk_life)
+  pad120.risk_pnc  <- qpareto2( pad120.cop[,2], s    =est120.parm_pnc[ 2], k   =est120.parm_pnc[ 1]) 
+  pad120.risk_pnc  <- pad120.risk_pnc  - mean(pad120.risk_pnc)
+  pad120.risk_cred <- qt(       pad120.cop[,3], df=4)*est120.parm_cred[2]      +est120.parm_cred[1] 
+  pad120.risk_cred <- pad120.risk_cred  - mean(pad120.risk_cred)
+  pad120.risk_mkt  <- exp(qnorm(pad120.cop[,4], sd   =est120.parm_mkt[ 2], mean=est120.parm_mkt[ 1]))
+  pad120.risk_mkt  <- pad120.risk_mkt  - mean(pad120.risk_mkt)
+  pad120.risk_total <- pad120.risk_life + pad120.risk_pnc + pad120.risk_cred + pad120.risk_mkt
+  
+  prd120.vstd[i]  <- sqrt(prd120.var_marginal %*% (diag(4)*0.75+0.25) %*% prd120.var_marginal)
+  prd120.vemp[i]  <- quantile(sam120.risk_total, probs=0.995)
+  prd120.varc[i]  <- quantile(pad120.risk_total, probs=0.995)
+  prd120.velp[i]  <- quantile(pld120.risk_total, probs=0.995)
+  
+  prd120.var_std  <- prd120.var_std + sqrt(prd120.var_marginal %*% (diag(4)*0.75+0.25) %*% prd120.var_marginal)/J
+  prd120.var_emp  <- prd120.var_emp + quantile(sam120.risk_total, probs=0.995)/J
+  prd120.var_arc  <- prd120.var_arc + quantile(pad120.risk_total, probs=0.995)/J
+  prd120.var_elp  <- prd120.var_elp + quantile(pld120.risk_total, probs=0.995)/J
+  
+}
+
+c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp)
+```
+
+
+
+
