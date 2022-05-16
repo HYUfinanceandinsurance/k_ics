@@ -176,4 +176,4 @@ summary(prd120.varc - pop.var_true)
 summary(prd120.velp - pop.var_true)
 summary(prd120.rvine - pop.var_true)
 
-save.image("K-ICS_analysis CDVine (J=1000, true=g cop, 4 dist, high cor, N=120).RData")
+save.image("K-ICS_analysis CDVine (J=1000, true=g cop, g dist, high cor, N=120).RData")
