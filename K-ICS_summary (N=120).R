@@ -41,12 +41,15 @@ stable <-
         c(colMeans(prd120_t4m), colMeans(prd120_t4m)[1:5]-colMeans(prd120_t4m)[6]),
         c(colMeans(prd120_t4h), colMeans(prd120_t4h)[1:5]-colMeans(prd120_t4h)[6]))
 
-rownames(stable) <- c("Low", "Medium", "High",
-                      "Low", "Medium", "High",
-                      "Low", "Medium", "High")
-
+rownames(stable) <- c("1", "2", "3",
+                      "4", "5", "6",
+                      "7", "8", "9")
+stable
 colnames(stable) <- c("Standard", "Empirical", "Archimedian", "Elliptical", "CVine", "True",
-                      "Standard", "Empirical", "Archimedian", "Elliptical" "CVine")
+                      "Standard", "Empirical", "Archimedian", "Elliptical", "CVine")
+
+tableA <- stable[,1:6]
+tableB <- stable[,7:11]
 
 round(stable)
 
