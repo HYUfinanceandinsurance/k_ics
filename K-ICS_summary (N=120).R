@@ -25,6 +25,7 @@ prd120_t4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.
 load("K-ICS_analysis (J=1000, true=t cop, 4 dist, low cor, N=120).RData")
 prd120_t4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
 
+
 rm(list = ls()[!ls() %in% c("prd120_t4h", "prd120_t4m", "prd120_t4l",
                             "prd120_a4h", "prd120_a4m", "prd120_a4l",
                             "prd120_ggh", "prd120_ggm", "prd120_ggl")])
@@ -71,7 +72,7 @@ plt120_ggh <- ggplot(prt120_ggh, aes(x=Label, y=Diff, fill=Label)) +
 plt120_ggh
 
 
-prt120_ggm     <- as.data.frame(cbind(as.vector(prd120_ggm[,1:4]-prd120_ggm[,5]),
+prt120_ggm     <- as.data.frame(cbind(as.vector(prd120_ggm[,1:5]-prd120_ggm[,6]),
                                       rep(1, 1000)))
 prt120_ggm[,2] <- labels
 colnames(prt120_ggm) <- c("Diff", "Label")
@@ -86,7 +87,7 @@ plt120_ggm <- ggplot(prt120_ggm, aes(x=Label, y=Diff, fill=Label)) +
 plt120_ggm
 
 
-prt120_ggl     <- as.data.frame(cbind(as.vector(prd120_ggl[,1:4]-prd120_ggl[,5]),
+prt120_ggl     <- as.data.frame(cbind(as.vector(prd120_ggl[,1:5]-prd120_ggl[,6]),
                                       rep(1, 1000)))
 prt120_ggl[,2] <- labels
 colnames(prt120_ggl) <- c("Diff", "Label")
@@ -101,7 +102,7 @@ plt120_ggl <- ggplot(prt120_ggl, aes(x=Label, y=Diff, fill=Label)) +
 plt120_ggl
 
 
-prt120_a4h     <- as.data.frame(cbind(as.vector(prd120_a4h[,1:4]-prd120_a4h[,5]),
+prt120_a4h     <- as.data.frame(cbind(as.vector(prd120_a4h[,1:5]-prd120_a4h[,6]),
                                       rep(1, 1000)))
 prt120_a4h[,2] <- labels
 colnames(prt120_a4h) <- c("Diff", "Label")
@@ -115,7 +116,7 @@ plt120_a4h <- ggplot(prt120_a4h, aes(x=Label, y=Diff, fill=Label)) +
 
 plt120_a4h
 
-prt120_a4m     <- as.data.frame(cbind(as.vector(prd120_a4m[,1:4]-prd120_a4m[,5]),
+prt120_a4m     <- as.data.frame(cbind(as.vector(prd120_a4m[,1:5]-prd120_a4m[,6]),
                                       rep(1, 1000)))
 prt120_a4m[,2] <- labels
 colnames(prt120_a4m) <- c("Diff", "Label")
@@ -130,7 +131,7 @@ plt120_a4m <- ggplot(prt120_a4m, aes(x=Label, y=Diff, fill=Label)) +
 plt120_a4m
 
 
-prt120_a4l     <- as.data.frame(cbind(as.vector(prd120_a4l[,1:4]-prd120_a4l[,5]),
+prt120_a4l     <- as.data.frame(cbind(as.vector(prd120_a4l[,1:5]-prd120_a4l[,6]),
                                       rep(1, 1000)))
 prt120_a4l[,2] <- labels
 colnames(prt120_a4l) <- c("Diff", "Label")
@@ -144,7 +145,7 @@ plt120_a4l <- ggplot(prt120_a4l, aes(x=Label, y=Diff, fill=Label)) +
 
 plt120_a4l
 
-prt120_t4h     <- as.data.frame(cbind(as.vector(prd120_t4h[,1:4]-prd120_t4h[,5]),
+prt120_t4h     <- as.data.frame(cbind(as.vector(prd120_t4h[,1:5]-prd120_t4h[,6]),
                                       rep(1, 1000)))
 prt120_t4h[,2] <- labels
 colnames(prt120_t4h) <- c("Diff", "Label")
@@ -158,7 +159,7 @@ plt120_t4h <- ggplot(prt120_t4h, aes(x=Label, y=Diff, fill=Label)) +
 
 plt120_t4h
 
-prt120_t4m     <- as.data.frame(cbind(as.vector(prd120_t4m[,1:4]-prd120_t4m[,5]),
+prt120_t4m     <- as.data.frame(cbind(as.vector(prd120_t4m[,1:5]-prd120_t4m[,6]),
                                       rep(1, 1000)))
 prt120_t4m[,2] <- labels
 colnames(prt120_t4m) <- c("Diff", "Label")
@@ -173,7 +174,7 @@ plt120_t4m <- ggplot(prt120_t4m, aes(x=Label, y=Diff, fill=Label)) +
 plt120_t4m
 
 
-prt120_t4l     <- as.data.frame(cbind(as.vector(prd120_t4l[,1:4]-prd120_t4l[,5]),
+prt120_t4l     <- as.data.frame(cbind(as.vector(prd120_t4l[,1:5]-prd120_t4l[,6]),
                                       rep(1, 1000)))
 prt120_t4l[,2] <- labels
 colnames(prt120_t4l) <- c("Diff", "Label")
