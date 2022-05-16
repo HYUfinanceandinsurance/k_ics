@@ -2,6 +2,8 @@
 library(copula)
 #install.packages("agop")
 library(agop)
+#install.packages("VineCopula")
+library(VineCopula)
 
 #### Generation of hypothetical population data for dependent risks   ####
 
