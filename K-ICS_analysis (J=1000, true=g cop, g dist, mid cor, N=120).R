@@ -155,4 +155,4 @@ summary(prd120.varc - pop.var_true)
 summary(prd120.velp - pop.var_true)
 summary(prd120.cvine - pop.var_true)
 
-save.image("K-ICS_analysis (J=1000, true=g cop, g dist, high cor, N=120).RData")
+save.image("K-ICS_analysis (J=1000, true=g cop, g dist, mid cor, N=120).RData")
