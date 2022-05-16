@@ -8,7 +8,7 @@ library(VineCopula)
 #### Generation of hypothetical population data for dependent risks   ####
 
 set.seed(10000)
-obj.cop <- gumbelCopula(param = 1.12, dim=4)
+obj.cop <- gumbelCopula(param = 1.2, dim=4)
 samples.cop <- rCopula(120000, obj.cop)
 cor(samples.cop)
 mktlsd <- sqrt(2*(log(500)-6))
