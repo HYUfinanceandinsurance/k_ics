@@ -8,8 +8,8 @@ library(VineCopula)
 #### Generation of hypothetical population data for dependent risks   ####
 
 set.seed(10000)
-obj.cop <- normalCopula(param = c(0.4, 0.4, 0.4, 0.4, 0.4, 0.4),
-                        dim=4, dispstr = "un")
+obj.cop <- normalCopula(param = c(0.25, 0.25, 0.25, 0.25, 0.25, 0.25),
+                   dim=4, dispstr = "un")
 samples.cop <- rCopula(120000, obj.cop)
 corr_std    <-  getSigma(obj.cop)
 
