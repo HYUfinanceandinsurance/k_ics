@@ -1,30 +1,29 @@
-load("K-ICS_analysis (J=1000, true=g cop, g dist, high cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=g cop, g dist, high cor, N=240).RData")
 prd240_ggh  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=g cop, g dist, mid cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=g cop, g dist, mid cor, N=240).RData")
 prd240_ggm  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=g cop, g dist, low cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=g cop, g dist, low cor, N=240).RData")
 prd240_ggl  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=Gumbel cop, 4 dist, high cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=Gumbel cop, 4 dist, high cor, N=240).RData")
 prd240_a4h  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=Gumbel cop, 4 dist, mid cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=Gumbel cop, 4 dist, mid cor, N=240).RData")
 prd240_a4m  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=Gumbel cop, 4 dist, low cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=Gumbel cop, 4 dist, low cor, N=240).RData")
 prd240_a4l  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=t cop, 4 dist, high cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=t cop, 4 dist, high cor, N=240).RData")
 prd240_t4h  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=t cop, 4 dist, mid cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=t cop, 4 dist, mid cor, N=240).RData")
 prd240_t4m  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
 
-load("K-ICS_analysis (J=1000, true=t cop, 4 dist, low cor, N=240).RData")
+load("K-ICS_analysis (J=500, true=t cop, 4 dist, low cor, N=240).RData")
 prd240_t4l  <- cbind(prd240.vstd, prd240.vemp, prd240.varc, prd240.velp, prd240.cvine, pop.var_true) 
-
 
 rm(list = ls()[!ls() %in% c("prd240_t4h", "prd240_t4m", "prd240_t4l",
                             "prd240_a4h", "prd240_a4m", "prd240_a4l",
@@ -41,24 +40,27 @@ stable <-
         c(colMeans(prd240_t4m), colMeans(prd240_t4m)[1:5]-colMeans(prd240_t4m)[6]),
         c(colMeans(prd240_t4h), colMeans(prd240_t4h)[1:5]-colMeans(prd240_t4h)[6]))
 
-rownames(stable) <- c("Low", "Medium", "High",
-                      "Low", "Medium", "High",
-                      "Low", "Medium", "High")
-
+rownames(stable) <- c("1", "2", "3",
+                      "4", "5", "6",
+                      "7", "8", "9")
+stable
 colnames(stable) <- c("Standard", "Empirical", "Archimedian", "Elliptical", "CVine", "True",
-                      "Standard", "Empirical", "Archimedian", "Elliptical" "CVine")
+                      "Standard", "Empirical", "Archimedian", "Elliptical", "CVine")
 
 round(stable)
 
-labels <- c(rep("Standard"  ,1000), rep("Empirical" ,1000),
-            rep("Internal 1",1000), rep("Internal 2",1000),
-            rep("Internal 3",1000))
+stable[, 1:6]
+stable[, 7:11]
+
+labels <- c(rep("Standard"  ,500), rep("Empirical" ,500),
+            rep("Internal 1",500), rep("Internal 2",500),
+            rep("Internal 3",500))
 labels <- factor(labels, levels = c("Standard", "Empirical", "Internal 1", "Internal 2", "Internal 3"))
 
 library(ggplot2)
 
 prt240_ggh     <- as.data.frame(cbind(as.vector(prd240_ggh[,1:5]-prd240_ggh[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_ggh[,2] <- labels
 colnames(prt240_ggh) <- c("Diff", "Label")
 
@@ -73,7 +75,7 @@ plt240_ggh
 
 
 prt240_ggm     <- as.data.frame(cbind(as.vector(prd240_ggm[,1:5]-prd240_ggm[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_ggm[,2] <- labels
 colnames(prt240_ggm) <- c("Diff", "Label")
 
@@ -88,7 +90,7 @@ plt240_ggm
 
 
 prt240_ggl     <- as.data.frame(cbind(as.vector(prd240_ggl[,1:5]-prd240_ggl[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_ggl[,2] <- labels
 colnames(prt240_ggl) <- c("Diff", "Label")
 
@@ -103,7 +105,7 @@ plt240_ggl
 
 
 prt240_a4h     <- as.data.frame(cbind(as.vector(prd240_a4h[,1:5]-prd240_a4h[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_a4h[,2] <- labels
 colnames(prt240_a4h) <- c("Diff", "Label")
 
@@ -117,7 +119,7 @@ plt240_a4h <- ggplot(prt240_a4h, aes(x=Label, y=Diff, fill=Label)) +
 plt240_a4h
 
 prt240_a4m     <- as.data.frame(cbind(as.vector(prd240_a4m[,1:5]-prd240_a4m[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_a4m[,2] <- labels
 colnames(prt240_a4m) <- c("Diff", "Label")
 
@@ -132,7 +134,7 @@ plt240_a4m
 
 
 prt240_a4l     <- as.data.frame(cbind(as.vector(prd240_a4l[,1:5]-prd240_a4l[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_a4l[,2] <- labels
 colnames(prt240_a4l) <- c("Diff", "Label")
 
@@ -146,7 +148,7 @@ plt240_a4l <- ggplot(prt240_a4l, aes(x=Label, y=Diff, fill=Label)) +
 plt240_a4l
 
 prt240_t4h     <- as.data.frame(cbind(as.vector(prd240_t4h[,1:5]-prd240_t4h[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_t4h[,2] <- labels
 colnames(prt240_t4h) <- c("Diff", "Label")
 
@@ -160,7 +162,7 @@ plt240_t4h <- ggplot(prt240_t4h, aes(x=Label, y=Diff, fill=Label)) +
 plt240_t4h
 
 prt240_t4m     <- as.data.frame(cbind(as.vector(prd240_t4m[,1:5]-prd240_t4m[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_t4m[,2] <- labels
 colnames(prt240_t4m) <- c("Diff", "Label")
 
@@ -175,7 +177,7 @@ plt240_t4m
 
 
 prt240_t4l     <- as.data.frame(cbind(as.vector(prd240_t4l[,1:5]-prd240_t4l[,6]),
-                                      rep(1, 1000)))
+                                      rep(1, 500)))
 prt240_t4l[,2] <- labels
 colnames(prt240_t4l) <- c("Diff", "Label")
 
