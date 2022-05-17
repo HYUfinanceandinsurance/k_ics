@@ -9,7 +9,7 @@ library(VineCopula)
 
 set.seed(10000)
 obj.cop <- normalCopula(param = c(0.25, 0.25, 0.25, 0.25, 0.25, 0.25),
-                   dim=4, dispstr = "un")
+                        dim=4, dispstr = "un")
 samples.cop <- rCopula(120000, obj.cop)
 corr_std    <-  getSigma(obj.cop)
 
@@ -34,13 +34,13 @@ prd120.vstd <- rep(NA, J)
 prd120.vemp <- rep(NA, J)
 prd120.varc <- rep(NA, J)
 prd120.velp <- rep(NA, J)
-prd120.cvine <- rep(NA, J)
+prd120.rvine <- rep(NA, J)
 
 prd120.var_std <- 0
 prd120.var_emp <- 0
 prd120.var_arc <- 0
 prd120.var_elp <- 0
-prd120.var_CVine <- 0
+prd120.var_RVine <- 0
 
 for (i in 1:J) {
   set.seed(i)
@@ -148,8 +148,8 @@ for (i in 1:J) {
   prv120.risk_pnc  <- qnorm(    prv120.cop[,2], sd   =est120.parm_pnc[2], mean=est120.parm_pnc[1])
   prv120.risk_pnc  <- prv120.risk_pnc  - mean(pad120.risk_pnc)
   prv120.risk_cred <- qnorm(    prv120.cop[,3], sd   =est120.parm_cred[2], mean=est120.parm_cred[1])
-  prv120.risk_cred <- pcv120.risk_cred  - mean(pad120.risk_cred)
-  prv120.risk_mkt  <- qnorm(    pcv120.cop[,4], sd   =est120.parm_mkt[2], mean=est120.parm_mkt[1])
+  prv120.risk_cred <- prv120.risk_cred  - mean(pad120.risk_cred)
+  prv120.risk_mkt  <- qnorm(    prv120.cop[,4], sd   =est120.parm_mkt[2], mean=est120.parm_mkt[1])
   prv120.risk_mkt  <- prv120.risk_mkt  - mean(prv120.risk_mkt)
   prv120.risk_total <- prv120.risk_life + prv120.risk_pnc + prv120.risk_cred + prv120.risk_mkt
   
@@ -164,7 +164,7 @@ for (i in 1:J) {
   prd120.var_emp  <- prd120.var_emp + quantile(sam120.risk_total, probs=0.995)/J
   prd120.var_arc  <- prd120.var_arc + quantile(pad120.risk_total, probs=0.995)/J
   prd120.var_elp  <- prd120.var_elp + quantile(pld120.risk_total, probs=0.995)/J
-  prd120.var_RVine <- prd120.var_RVine + quantile(pcv120.risk_total, probs=0.995)/J
+  prd120.var_RVine <- prd120.var_RVine + quantile(prv120.risk_total, probs=0.995)/J
 }
 
 c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_RVine)
