@@ -34,7 +34,6 @@ prd120.varc <- rep(NA, J)
 prd120.velp <- rep(NA, J)
 prd120.cvine <- rep(NA, J)
 prd120.c2vine <- rep(NA, J)
-prd120.c3vine <- rep(NA, J)
 
 prd120.var_std <- 0
 prd120.var_emp <- 0
@@ -42,7 +41,7 @@ prd120.var_arc <- 0
 prd120.var_elp <- 0
 prd120.var_CVine <- 0
 prd120.var_C2Vine <- 0
-prd120.var_C3Vine <- 0
+
 
 for (i in 1:J) {
   set.seed(i)
@@ -104,13 +103,6 @@ for (i in 1:J) {
                               indeptest = TRUE, level = 0.05, 
                               type = "RVine")
   
-  c3vm <- RVineStructureSelect(psd120.cop,
-                              c(1,2,4),
-                              rotations = F, 
-                              selectioncrit = "AIC",
-                              indeptest = TRUE, level = 0.01, 
-                              type = "RVine")
-  
   prd120.elpcopfit <- fitCopula(tCopula(dim=4, dispstr = "un"), psd120.cop, method="mpl",
                                 start=init.elpparm)
   pld120.cop <- rCopula(20000, prd120.elpcopfit@copula)
@@ -164,19 +156,6 @@ for (i in 1:J) {
   pc2v120.risk_total <- pc2v120.risk_life + pc2v120.risk_pnc + pc2v120.risk_cred + pc2v120.risk_mkt
   
   
-  # Internal 5 (C3Vine)
-  pc3v120.cop <- RVineSim(20000, c3vm)
-  
-  pc3v120.risk_life <- qnorm(    pc3v120.cop[,1], sd   =est120.parm_life[2], mean=est120.parm_life[1])
-  pc3v120.risk_life <- pc3v120.risk_life - mean(pcv120.risk_life)
-  pc3v120.risk_pnc  <- qpareto2( pc3v120.cop[,2], s    =est120.parm_pnc[ 2], k   =est120.parm_pnc[ 1]) 
-  pc3v120.risk_pnc  <- pc3v120.risk_pnc  - mean(pcv120.risk_pnc)
-  pc3v120.risk_cred <- qt(       pc3v120.cop[,3], df=4)*est120.parm_cred[2]      +est120.parm_cred[1] 
-  pc3v120.risk_cred <- pc3v120.risk_cred  - mean(pcv120.risk_cred)
-  pc3v120.risk_mkt  <- exp(qnorm(pc3v120.cop[,4], sd   =est120.parm_mkt[ 2], mean=est120.parm_mkt[ 1]))
-  pc3v120.risk_mkt <- pc2v120.risk_mkt - mean(pc3v120.risk_mkt)
-  pc3v120.risk_total <- pc3v120.risk_life + pc3v120.risk_pnc + pc3v120.risk_cred + pc3v120.risk_mkt
-  
   prd120.vstd[i]  <- sqrt(prd120.var_marginal %*% (diag(4)*0.75+0.25) %*% prd120.var_marginal)
   prd120.vemp[i]  <- quantile(sam120.risk_total, probs=0.995)
   prd120.varc[i]  <- quantile(pad120.risk_total, probs=0.995)
@@ -197,13 +176,11 @@ for (i in 1:J) {
 c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_CVine, prd120.var_C2Vine, prd120.var_C3Vine)
 c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_CVine, prd120.var_C2Vine, prd120.var_C3Vine) - pop.var_true
 
-
 summary(prd120.vstd - pop.var_true)
 summary(prd120.vemp - pop.var_true)
 summary(prd120.varc - pop.var_true)
 summary(prd120.velp - pop.var_true)
 summary(prd120.cvine - pop.var_true)
 summary(prd120.c2vine - pop.var_true)
-summary(prd120.c3vine - pop.var_true)
 
 save.image("K-ICS_analysis2 (J=1000, true=Gumbel cop, 4 dist, low cor, N=120).RData")
