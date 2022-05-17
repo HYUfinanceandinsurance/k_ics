@@ -145,11 +145,11 @@ for (i in 1:J) {
   pc2v120.cop <- RVineSim(20000, c2vm)
   
   pc2v120.risk_life <- qnorm(    pc2v120.cop[,1], sd   =est120.parm_life[2], mean=est120.parm_life[1])
-  pc2v120.risk_life <- pc2v120.risk_life - mean(pcv120.risk_life)
+  pc2v120.risk_life <- pc2v120.risk_life - mean(pc2v120.risk_life)
   pc2v120.risk_pnc  <- qpareto2( pc2v120.cop[,2], s    =est120.parm_pnc[ 2], k   =est120.parm_pnc[ 1]) 
-  pc2v120.risk_pnc  <- pc2v120.risk_pnc  - mean(pcv120.risk_pnc)
+  pc2v120.risk_pnc  <- pc2v120.risk_pnc  - mean(pc2v120.risk_pnc)
   pc2v120.risk_cred <- qt(       pc2v120.cop[,3], df=4)*est120.parm_cred[2]      +est120.parm_cred[1] 
-  pc2v120.risk_cred <- pc2v120.risk_cred  - mean(pcv120.risk_cred)
+  pc2v120.risk_cred <- pc2v120.risk_cred  - mean(pc2v120.risk_cred)
   pc2v120.risk_mkt  <- exp(qnorm(pc2v120.cop[,4], sd   =est120.parm_mkt[ 2], mean=est120.parm_mkt[ 1]))
   pc2v120.risk_mkt <- pc2v120.risk_mkt - mean(pc2v120.risk_mkt)
   pc2v120.risk_total <- pc2v120.risk_life + pc2v120.risk_pnc + pc2v120.risk_cred + pc2v120.risk_mkt
