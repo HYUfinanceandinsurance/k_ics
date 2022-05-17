@@ -170,7 +170,7 @@ for (i in 1:J) {
   prd120.var_arc  <- prd120.var_arc + quantile(pad120.risk_total, probs=0.995)/J
   prd120.var_elp  <- prd120.var_elp + quantile(pld120.risk_total, probs=0.995)/J
   prd120.var_CVine <- prd120.var_CVine + quantile(pcv120.risk_total, probs=0.995)/J
-  prd120.var_CVine <- prd120.var_C2Vine + quantile(pc2v120.risk_total, probs=0.995)/J
+  prd120.var_C2Vine <- prd120.var_C2Vine + quantile(pc2v120.risk_total, probs=0.995)/J
 }
 
 c(prd120.var_std, prd120.var_emp, prd120.var_arc, prd120.var_elp, prd120.var_CVine, prd120.var_C2Vine)
