@@ -70,7 +70,7 @@ for (i in 1:J) {
   mkt_trans       <- 1e-16 - min(sam240.risk_mkt)
   trs240.risk_mkt  <- sam240.risk_mkt+mkt_trans 
   est240.parm_mkt  <- c(log(mean(trs240.risk_mkt))-0.5*log(var(trs240.risk_mkt)/mean(trs240.risk_mkt)^2+1),
-                       sqrt(log(var( trs240.risk_mkt)/        mean(trs240.risk_mkt)^2+1)))
+                        sqrt(log(var( trs240.risk_mkt)/        mean(trs240.risk_mkt)^2+1)))
   
   prd240.var_marginal <- c(
     qnorm(    0.995, sd   =est240.parm_life[2], mean=est240.parm_life[1]),
@@ -104,7 +104,7 @@ for (i in 1:J) {
                                type = "RVine")
   
   prd240.elpcopfit <- fitCopula(tCopula(dim=4, dispstr = "un"), psd240.cop, method="mpl",
-                               start=init.elpparm)
+                                start=init.elpparm)
   pld240.cop <- rCopula(20000, prd240.elpcopfit@copula)
   
   pld240.risk_life <- qnorm(    pld240.cop[,1], sd   =est240.parm_life[2], mean=est240.parm_life[1])
