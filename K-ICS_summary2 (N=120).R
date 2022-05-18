@@ -1,35 +1,34 @@
 load("K-ICS_analysis2 (J=1000, true=g cop, g dist, high cor, N=120).RData")
-prd120_ggh  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_ggh  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=g cop, g dist, mid cor, N=120).RData")
-prd120_ggm  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_ggm  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=g cop, g dist, low cor, N=120).RData")
-prd120_ggl  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_ggl  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=Gumbel cop, 4 dist, high cor, N=120).RData")
-prd120_a4h  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_a4h  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=Gumbel cop, 4 dist, mid cor, N=120).RData")
-prd120_a4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_a4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=Gumbel cop, 4 dist, low cor, N=120).RData")
-prd120_a4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_a4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=t cop, 4 dist, high cor, N=120).RData")
-prd120_t4h  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_t4h  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=t cop, 4 dist, mid cor, N=120).RData")
-prd120_t4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_t4m  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 load("K-ICS_analysis2 (J=1000, true=t cop, 4 dist, low cor, N=120).RData")
-prd120_t4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, pop.var_true) 
+prd120_t4l  <- cbind(prd120.vstd, prd120.vemp, prd120.varc, prd120.velp, prd120.cvine, prd120.c2vine, pop.var_true) 
 
 
 rm(list = ls()[!ls() %in% c("prd120_t4h", "prd120_t4m", "prd120_t4l",
                             "prd120_a4h", "prd120_a4m", "prd120_a4l",
                             "prd120_ggh", "prd120_ggm", "prd120_ggl")])
-
 stable <-
   rbind(c(colMeans(prd120_ggl), colMeans(prd120_ggl)[1:6]-colMeans(prd120_ggl)[7]),
         c(colMeans(prd120_ggm), colMeans(prd120_ggm)[1:6]-colMeans(prd120_ggm)[7]),
@@ -75,7 +74,7 @@ plt120_ggh <- ggplot(prt120_ggh, aes(x=Label, y=Diff, fill=Label)) +
 plt120_ggh
 
 
-prt120_ggm     <- as.data.frame(cbind(as.vector(prd120_ggm[,1:5]-prd120_ggm[,6]),
+prt120_ggm     <- as.data.frame(cbind(as.vector(prd120_ggm[,1:6]-prd120_ggm[,7]),
                                       rep(1, 1000)))
 prt120_ggm[,2] <- labels
 colnames(prt120_ggm) <- c("Diff", "Label")
