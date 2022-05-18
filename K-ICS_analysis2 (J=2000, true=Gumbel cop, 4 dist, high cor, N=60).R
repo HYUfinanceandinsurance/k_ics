@@ -181,4 +181,4 @@ summary(prd60.velp - pop.var_true)
 summary(prd60.cvine - pop.var_true)
 summary(prd60.c2vine - pop.var_true)
 
-save.image("K-ICS_analysis2 (J=2000, true=Gumbel cop, 4 dist, low cor, N=60).RData")
+save.image("K-ICS_analysis2 (J=2000, true=Gumbel cop, 4 dist, high cor, N=60).RData")
